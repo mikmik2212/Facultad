@@ -2,77 +2,174 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Malla Interactiva</title>
+  <title>Malla Interactiva – Obstetricia</title>
   <style>
-    body {
-      font-family: system-ui, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 2rem;
-      background: #f8fafc;
-    }h1 {
-  font-size: 1.8rem;
-  margin-bottom: 1rem;
+    :root {
+      --rosa-claro: #ffe4ec;
+      --rosa-medio: #fbb6ce;
+      --rosa-oscuro: #f472b6;
+      --rosa-hover: #fe90c7;
+      --texto: #4a4a4a;
+      --borde: #f8c4d9;
+    }* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Inter", system-ui, sans-serif;
+  background: var(--rosa-claro);
+  color: var(--texto);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem 4rem;
 }
 
-#grid {
-  display: grid;
-  grid-template-columns: repeat(10, 40px);
-  grid-auto-rows: 40px;
-  gap: 4px;
-  margin-bottom: 1.5rem;
+h1 {
+  margin: 0 0 2rem;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--rosa-oscuro);
+  text-align: center;
 }
 
-.cell {
-  background: #e2e8f0;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.2s ease;
+#semestres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+  justify-content: center;
+  width: 100%;
+  max-width: 1000px;
 }
 
-.cell.active {
-  background: #38bdf8;
+.semestre {
+  background: #fff;
+  border: 2px dashed var(--borde);
+  border-radius: 12px;
+  padding: 1rem;
+  width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.04);
 }
 
-button {
-  padding: 0.6rem 1.2rem;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
-  background: #64748b;
+.semestre h2 {
+  margin: 0 0 0.4rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--rosa-oscuro);
+  text-align: center;
+}
+
+.ramo {
+  background: linear-gradient(90deg, var(--rosa-medio), var(--rosa-oscuro));
   color: #fff;
-  transition: opacity 0.2s ease;
+  border: none;
+  padding: 0.4rem 0.6rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: filter 0.2s ease;
 }
 
-button:hover {
-  opacity: 0.85;
+.ramo:hover { filter: brightness(1.1); }
+
+.ramo.aprobado {
+  background: #a7f3d0; /* verde suave */
+  color: #055f35;
+  text-decoration: line-through;
 }
+
+/* botón reset */
+#reset {
+  margin-top: 2rem;
+  padding: 0.6rem 1.4rem;
+  font-size: 1rem;
+  background: var(--rosa-oscuro);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.12);
+  transition: opacity 0.25s;
+}
+#reset:hover { opacity: 0.85; }
 
   </style>
 </head>
 <body>
-  <h1>Malla Interactiva</h1>
-  <div id="grid"></div>
-  <button id="clear">Limpiar</button>  <script>
-    const grid = document.getElementById('grid');
-    const filas = 10;   // Cambia aquí para más filas
-    const columnas = 10; // Cambia aquí para más columnas
+  <h1>Obstetricia y Puericultura – Malla Interactiva</h1>  <div id="semestres"></div>
+  <button id="reset">Reiniciar selección</button>  <script>
+    // Datos de ejemplo (puedes editar libremente)
+    const data = [
+      {
+        nombre: "3º Semestre",
+        ramos: [
+          "Fundamentos de Enfermería II",
+          "Obstetricia Fisiológica I",
+          "Neonatología I",
+          "Fisiología de Sistemas",
+          "Inmunología",
+          "Agentes Vivos de Enfermedad",
+          "Cs. Sociales y Salud II",
+          "Inglés III"
+        ]
+      },
+      {
+        nombre: "4º Semestre",
+        ramos: [
+          "Neonatología II",
+          "Obstetricia Fisiológica II",
+          "Ginecología Fisiológica",
+          "Fisiopatología",
+          "Infectología",
+          "Farmacología",
+          "Integración al Desempeño Profesional II",
+          "Investigación en Salud I"
+        ]
+      },
+      {
+        nombre: "5º Semestre",
+        ramos: [
+          "Clínica Neonatal I",
+          "Clínica de Partos I",
+          "Clínica de Atención Primaria I",
+          "Clínica de Puerperio",
+          "Clínica de Salud Comunitaria",
+          "Módulo Interdisciplinario",
+          "Optativo ❁"
+        ]
+      }
+    ];
 
-    // Generar la malla
-    for (let i = 0; i < filas * columnas; i++) {
-      const cell = document.createElement('div');
-      cell.classList.add('cell');
-      cell.addEventListener('click', () => {
-        cell.classList.toggle('active');
+    const contenedor = document.getElementById("semestres");
+
+    // Crea las tarjetas de semestres y ramos
+    data.forEach(sem => {
+      const tarjeta = document.createElement("div");
+      tarjeta.className = "semestre";
+
+      const h2 = document.createElement("h2");
+      h2.textContent = sem.nombre;
+      tarjeta.appendChild(h2);
+
+      sem.ramos.forEach(ramo => {
+        const btn = document.createElement("button");
+        btn.className = "ramo";
+        btn.textContent = ramo;
+        btn.addEventListener("click", () => {
+          btn.classList.toggle("aprobado");
+        });
+        tarjeta.appendChild(btn);
       });
-      grid.appendChild(cell);
-    }
 
-    // Botón para limpiar la malla
-    document.getElementById('clear').addEventListener('click', () => {
-      document.querySelectorAll('.cell').forEach(c => c.classList.remove('active'));
+      contenedor.appendChild(tarjeta);
+    });
+
+    // Reset
+    document.getElementById("reset").addEventListener("click", () => {
+      document.querySelectorAll(".ramo").forEach(b => b.classList.remove("aprobado"));
+      window.scrollTo({ top: 0, behavior: "smooth" });
     });
   </script></body>
-</html>/
+</html>
