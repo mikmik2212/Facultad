@@ -1,215 +1,305 @@
-
-
-    <!DOCTYPE html><html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Malla Interactiva – Ingeniería Electrónica</title>
-  <style>
-    :root {
-      --gris-claro: #e5e7eb;
-      --rosa-claro: #ffe4ec;
-      --rosa-medio: #fbb6ce;
-      --rosa-oscuro: #f472b6;
-      --texto: #4a4a4a;
-      --borde: #f8c4d9;
-    }
-    * { box-sizing: border-box; }body {
-  margin: 0;
-  font-family: "Inter", system-ui, sans-serif;
-  background: var(--rosa-claro);
-  color: var(--texto);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 2rem 1rem 4rem;
-}
-
-h1 {
-  margin: 0 0 2rem;
-  font-size: 2rem;
-  font-weight: 700;
-  color: var(--rosa-oscuro);
-  text-align: center;
-}
-
-#semestres {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.2rem;
-  justify-content: center;
-  width: 100%;
-  max-width: 1200px;
-}
-
-.semestre {
-  background: #fff;
-  border: 2px dashed var(--borde);
-  border-radius: 12px;
-  padding: 1rem;
-  width: 300px;
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.04);
-}
-
-.semestre h2 {
-  margin: 0 0 0.4rem;
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: var(--rosa-oscuro);
-  text-align: center;
-}
-
-.ramo {
-  background: var(--gris-claro);
-  color: #4b5563;
-  border: none;
-  padding: 0.4rem 0.6rem;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-.ramo.habilitado {
-  background: linear-gradient(90deg, var(--rosa-medio), var(--rosa-oscuro));
-  color: #fff;
-}
-
-.ramo:hover { filter: brightness(1.05); }
-
-.ramo.aprobado {
-  background: #a7f3d0;
-  color: #055f35;
-  text-decoration: line-through;
-}
-
-#reset {
-  margin-top: 2rem;
-  padding: 0.6rem 1.4rem;
-  font-size: 1rem;
-  background: var(--rosa-oscuro);
-  color: #fff;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.12);
-  transition: opacity 0.25s;
-}
-
-#reset:hover { opacity: 0.85; }
-
-  </style>
-</head>
-<body>
-  <h1>Ingeniería Electrónica – Malla Interactiva</h1>
-  <div id="semestres"></div>
-  <button id="reset">Reiniciar selección</button>  <script>
+<script>
+    // ESTADOS:
+    // 'cursada' (Regular): Basta con tener la materia anterior REGULARIZADA o APROBADA.
+    // 'aprobada' (Final): Requiere tener la materia anterior APROBADA (Final Rendido).
     const materias = [
-      { id: 1, nombre: "Informática I", nivel: 1, correlativas: [] },
-      { id: 2, nombre: "Álgebra y Geometría Analítica", nivel: 1, correlativas: [] },
-      { id: 3, nombre: "Análisis Matemático I", nivel: 1, correlativas: [] },
-      { id: 4, nombre: "Ingeniería y Sociedad", nivel: 1, correlativas: [] },
-      { id: 5, nombre: "Análisis Matemático II", nivel: 1, correlativas: [2, 3] },
-      { id: 6, nombre: "Física I", nivel: 1, correlativas: [2, 3] },
-      { id: 7, nombre: "Diseño Asistido por Computadora", nivel: 1, correlativas: [] },
-      { id: 8, nombre: "Informática II", nivel: 2, correlativas: [1, 2, 3] },
-      { id: 9, nombre: "Análisis de Señales y Sistemas", nivel: 2, correlativas: [5] },
-      { id: 10, nombre: "Química General", nivel: 2, correlativas: [] },
-      { id: 11, nombre: "Física II", nivel: 2, correlativas: [3, 6] },
-      { id: 12, nombre: "Probabilidad y Estadística", nivel: 2, correlativas: [2, 3] },
-      { id: 13, nombre: "Física Electrónica", nivel: 2, correlativas: [11] },
-      { id: 14, nombre: "Inglés I", nivel: 2, correlativas: [] },
-      { id: 15, nombre: "Teoría de los Circuitos I", nivel: 3, correlativas: [5, 11] },
-      { id: 16, nombre: "Técnicas Digitales I", nivel: 3, correlativas: [1] },
-      { id: 17, nombre: "Dispositivos Electrónicos", nivel: 3, correlativas: [1, 3, 10] },
-      { id: 18, nombre: "Legislación", nivel: 3, correlativas: [8] },
-      { id: 19, nombre: "Electrónica Aplicada I", nivel: 3, correlativas: [10, 11] },
-      { id: 20, nombre: "Medios de Enlace", nivel: 3, correlativas: [5, 11] },
-      { id: 21, nombre: "Inglés II", nivel: 3, correlativas: [14] },
-      { id: 22, nombre: "Técnicas Digitales II", nivel: 4, correlativas: [8, 16, 19] },
-      { id: 23, nombre: "Medidas Electrónicas I", nivel: 4, correlativas: [9, 15, 16, 19] },
-      { id: 24, nombre: "Teoría de los Circuitos II", nivel: 4, correlativas: [9, 15] },
-      { id: 25, nombre: "Máquinas e Instalaciones Eléctricas", nivel: 4, correlativas: [9, 15] },
-      { id: 26, nombre: "Sistemas de Comunicaciones", nivel: 4, correlativas: [9, 12, 19, 20] },
-      { id: 27, nombre: "Electrónica Aplicada II", nivel: 4, correlativas: [9, 13, 15, 17, 19] },
-      { id: 28, nombre: "Seguridad, Higiene y Medio Ambiente", nivel: 4, correlativas: [4, 10] },
-      { id: 29, nombre: "Técnicas Digitales III", nivel: 5, correlativas: [22] },
-      { id: 30, nombre: "Medidas Electrónicas II", nivel: 5, correlativas: [22, 23, 26, 27] },
-      { id: 31, nombre: "Sistemas de Control", nivel: 5, correlativas: [24, 25] },
-      { id: 32, nombre: "Electrónica Aplicada III", nivel: 5, correlativas: [24, 26, 27] },
-      { id: 33, nombre: "Tecnología Electrónica", nivel: 5, correlativas: [23] },
-      { id: 34, nombre: "Electrónica de Potencia", nivel: 5, correlativas: [23, 25, 27] },
-      { id: 35, nombre: "Organización Industrial", nivel: 5, correlativas: [18] },
-      { id: 36, nombre: "Economía", nivel: 6, correlativas: [8] },
-      { id: 37, nombre: "Proyecto Final", nivel: 6, correlativas: [29, 30, 32] }
+        // NIVEL 1
+        { id: 1, nombre: "Informática I", nivel: 1, correlativas: [] },
+        { id: 2, nombre: "Álgebra y Geometría Analítica", nivel: 1, correlativas: [] },
+        // AM I (3): Requiere 'Regular' de - y 'Aprobada' de - (Regla especial: Libre)
+        { id: 3, nombre: "Análisis Matemático I", nivel: 1, correlativas: [] }, 
+        { id: 4, nombre: "Ingeniería y Sociedad", nivel: 1, correlativas: [] },
+        // AM II (5): Requiere 'Regular' de 2-3 (Álgebra y AM I) y 'Aprobada' de -
+        { id: 5, nombre: "Análisis Matemático II", nivel: 1, correlativas: [
+            { id: 2, tipo: 'cursada' }, { id: 3, tipo: 'cursada' } 
+        ] },
+        { id: 6, nombre: "Física I", nivel: 1, correlativas: [] },
+        { id: 7, nombre: "Diseño asistido por computadora", nivel: 1, correlativas: [] },
+        
+        // NIVEL 2
+        // Informática II (8): Requiere 'Regular' de 1-2-3 (Info I, Álgebra, AM I)
+        { id: 8, nombre: "Informática II", nivel: 2, correlativas: [
+            { id: 1, tipo: 'cursada' }, { id: 2, tipo: 'cursada' }, { id: 3, tipo: 'cursada' } 
+        ] },
+        // Análisis de Señales (9): Requiere 'Regular' de 5 (AM II) y 'Aprobada' de 2-3 (Álgebra, AM I)
+        { id: 9, nombre: "Análisis de Señales y Sistemas", nivel: 2, correlativas: [
+            { id: 5, tipo: 'cursada' }, 
+            { id: 2, tipo: 'aprobada' }, { id: 3, tipo: 'aprobada' } 
+        ] },
+        // Química (10): Requiere 'Regular' de - y 'Aprobada' de - (Regla especial: Libre)
+        { id: 10, nombre: "Química General", nivel: 2, correlativas: [] }, 
+        // Física II (11): Requiere 'Regular' de 3-6 (AM I, Física I)
+        { id: 11, nombre: "Física II", nivel: 2, correlativas: [
+            { id: 3, tipo: 'cursada' }, { id: 6, tipo: 'cursada' } 
+        ] },
+        // Prob. y Est. (12): Requiere 'Regular' de 2-3 (Álgebra, AM I)
+        { id: 12, nombre: "Probabilidad y Estadística", nivel: 2, correlativas: [
+            { id: 2, tipo: 'cursada' }, { id: 3, tipo: 'cursada' } 
+        ] },
+        // Física Electrónica (13): Requiere 'Regular' de 11 (Física II) y 'Aprobada' de 2-3-6 (Álgebra, AM I, Física I)
+        { id: 13, nombre: "Física Electrónica", nivel: 2, correlativas: [
+            { id: 11, tipo: 'cursada' }, 
+            { id: 2, tipo: 'aprobada' }, { id: 3, tipo: 'aprobada' }, { id: 6, tipo: 'aprobada' } 
+        ] },
+        { id: 14, nombre: "Inglés I", nivel: 2, correlativas: [] },
+        
+        // NIVEL 3
+        // Teoría Circuitos I (15): Requiere 'Regular' de 5-11 (AM II, Física II) y 'Aprobada' de 3-6 (AM I, Física I)
+        { id: 15, nombre: "Teoría de los Circuitos I", nivel: 3, correlativas: [
+            { id: 5, tipo: 'cursada' }, { id: 11, tipo: 'cursada' }, 
+            { id: 3, tipo: 'aprobada' }, { id: 6, tipo: 'aprobada' } 
+        ] },
+        // Técnicas Digitales I (16): Requiere 'Regular' de 1 (Info I) y 'Aprobada' de 2 (Álgebra)
+        { id: 16, nombre: "Técnicas Digitales", nivel: 3, correlativas: [
+            { id: 1, tipo: 'cursada' }, 
+            { id: 2, tipo: 'aprobada' }
+        ] },
+        // Dispositivos Electrónicos (17): Requiere 'Regular' de 1-3-10 (Info I, AM I, Química)
+        { id: 17, nombre: "Dispositivos Electrónicos", nivel: 3, correlativas: [
+            { id: 1, tipo: 'cursada' }, { id: 3, tipo: 'cursada' }, { id: 10, tipo: 'cursada' } 
+        ] },
+        // Legislación (18): Requiere 'Regular' de 8 (Info II) y 'Aprobada' de 4 (Ing. y Soc.)
+        { id: 18, nombre: "Legislación", nivel: 3, correlativas: [
+            { id: 8, tipo: 'cursada' }, 
+            { id: 4, tipo: 'aprobada' } 
+        ] },
+        // Electrónica Aplicada I (19): Requiere 'Regular' de 10-11 (Química, Física II) y 'Aprobada' de 1-3-6 (Info I, AM I, Física I)
+        { id: 19, nombre: "Electrónica Aplicada I", nivel: 3, correlativas: [
+            { id: 10, tipo: 'cursada' }, { id: 11, tipo: 'cursada' }, 
+            { id: 1, tipo: 'aprobada' }, { id: 3, tipo: 'aprobada' }, { id: 6, tipo: 'aprobada' } 
+        ] },
+        // Medios de Enlace (20): Requiere 'Regular' de 5-11 (AM II, Física II) y 'Aprobada' de 2-3-6 (Álgebra, AM I, Física I)
+        { id: 20, nombre: "Medios de Enlace", nivel: 3, correlativas: [
+            { id: 5, tipo: 'cursada' }, { id: 11, tipo: 'cursada' }, 
+            { id: 2, tipo: 'aprobada' }, { id: 3, tipo: 'aprobada' }, { id: 6, tipo: 'aprobada' } 
+        ] },
+        // Inglés II (21): Requiere 'Aprobada' de 14 (Inglés I)
+        { id: 21, nombre: "Inglés II", nivel: 3, correlativas: [
+            { id: 14, tipo: 'aprobada' } 
+        ] },
+
+        // NIVEL 4
+        // Técnicas Digitales II (22): Requiere 'Regular' de 8-16-19 y 'Aprobada' de 10-11
+        { id: 22, nombre: "Técnicas Digitales II", nivel: 4, correlativas: [
+            { id: 8, tipo: 'cursada' }, { id: 16, tipo: 'cursada' }, { id: 19, tipo: 'cursada' }, 
+            { id: 10, tipo: 'aprobada' }, { id: 11, tipo: 'aprobada' } 
+        ] },
+        // Medidas Electrónicas I (23): Requiere 'Regular' de 9-15-16-19 y 'Aprobada' de 5-10-11
+        { id: 23, nombre: "Medidas Electrónicas I", nivel: 4, correlativas: [
+            { id: 9, tipo: 'cursada' }, { id: 15, tipo: 'cursada' }, { id: 16, tipo: 'cursada' }, { id: 19, tipo: 'cursada' }, 
+            { id: 5, tipo: 'aprobada' }, { id: 10, tipo: 'aprobada' }, { id: 11, tipo: 'aprobada' } 
+        ] },
+        // Teoría Circuitos II (24): Requiere 'Regular' de 9-15 y 'Aprobada' de 5-11
+        { id: 24, nombre: "Teoría de los Circuitos II", nivel: 4, correlativas: [
+            { id: 9, tipo: 'cursada' }, { id: 15, tipo: 'cursada' }, 
+            { id: 5, tipo: 'aprobada' }, { id: 11, tipo: 'aprobada' } 
+        ] },
+        // Máquinas (25): Requiere 'Regular' de 9-15 y 'Aprobada' de 5-11
+        { id: 25, nombre: "Máquinas e Instalaciones Eléctricas", nivel: 4, correlativas: [
+            { id: 9, tipo: 'cursada' }, { id: 15, tipo: 'cursada' }, 
+            { id: 5, tipo: 'aprobada' }, { id: 11, tipo: 'aprobada' } 
+        ] },
+        // Sist. Com. (26): Requiere 'Regular' de 9-12-19-20 y 'Aprobada' de 5-11
+        { id: 26, nombre: "Sistemas de Comunicaciones", nivel: 4, correlativas: [
+            { id: 9, tipo: 'cursada' }, { id: 12, tipo: 'cursada' }, { id: 19, tipo: 'cursada' }, { id: 20, tipo: 'cursada' }, 
+            { id: 5, tipo: 'aprobada' }, { id: 11, tipo: 'aprobada' } 
+        ] },
+        // Electrónica Aplicada II (27): Requiere 'Regular' de 9-13-15-17-19 y 'Aprobada' de 5-11-14
+        { id: 27, nombre: "Electrónica Aplicada II", nivel: 4, correlativas: [
+            { id: 9, tipo: 'cursada' }, { id: 13, tipo: 'cursada' }, { id: 15, tipo: 'cursada' }, { id: 17, tipo: 'cursada' }, { id: 19, tipo: 'cursada' }, 
+            { id: 5, tipo: 'aprobada' }, { id: 11, tipo: 'aprobada' }, { id: 14, tipo: 'aprobada' } 
+        ] },
+        // Seguridad, Higiene (28): Requiere 'Aprobada' de 4-10
+        { id: 28, nombre: "Seguridad, Higiene y Medio Ambiente", nivel: 4, correlativas: [
+            { id: 4, tipo: 'aprobada' }, { id: 10, tipo: 'aprobada' } 
+        ] },
+
+        // NIVEL 5
+        // Técnicas Digitales III (29): Requiere 'Regular' de 22 y 'Aprobada' de 8-10-19
+        { id: 29, nombre: "Técnicas Digitales III", nivel: 5, correlativas: [
+            { id: 22, tipo: 'cursada' }, 
+            { id: 8, tipo: 'aprobada' }, { id: 10, tipo: 'aprobada' }, { id: 19, tipo: 'aprobada' } 
+        ] },
+        // Medidas Electrónicas II (30): Requiere 'Regular' de 22-23-26-27 y 'Aprobada' de 7-13-15-16-19-21
+        { id: 30, nombre: "Medidas Electrónicas II", nivel: 5, correlativas: [
+            { id: 22, tipo: 'cursada' }, { id: 23, tipo: 'cursada' }, { id: 26, tipo: 'cursada' }, { id: 27, tipo: 'cursada' }, 
+            { id: 7, tipo: 'aprobada' }, { id: 13, tipo: 'aprobada' }, { id: 15, tipo: 'aprobada' }, { id: 16, tipo: 'aprobada' }, { id: 19, tipo: 'aprobada' }, { id: 21, tipo: 'aprobada' } 
+        ] },
+        // Sist. de Control (31): Requiere 'Regular' de 24-25 y 'Aprobada' de 13-15
+        { id: 31, nombre: "Sistemas de Control", nivel: 5, correlativas: [
+            { id: 24, tipo: 'cursada' }, { id: 25, tipo: 'cursada' }, 
+            { id: 13, tipo: 'aprobada' }, { id: 15, tipo: 'aprobada' } 
+        ] },
+        // Electrónica Aplicada III (32): Requiere 'Regular' de 24-26-27 y 'Aprobada' de 13-15-19
+        { id: 32, nombre: "Electrónica Aplicada III", nivel: 5, correlativas: [
+            { id: 24, tipo: 'cursada' }, { id: 26, tipo: 'cursada' }, { id: 27, tipo: 'cursada' }, 
+            { id: 13, tipo: 'aprobada' }, { id: 15, tipo: 'aprobada' }, { id: 19, tipo: 'aprobada' } 
+        ] },
+        // Tecnología Electrónica (33): Requiere 'Regular' de 23 y 'Aprobada' de 13-16-19
+        { id: 33, nombre: "Tecnología Electrónica", nivel: 5, correlativas: [
+            { id: 23, tipo: 'cursada' }, 
+            { id: 13, tipo: 'aprobada' }, { id: 16, tipo: 'aprobada' }, { id: 19, tipo: 'aprobada' } 
+        ] },
+        // Electrónica de Potencia (34): Requiere 'Regular' de 23-25-27 y 'Aprobada' de 13-16-19
+        { id: 34, nombre: "Electrónica de Potencia", nivel: 5, correlativas: [
+            { id: 23, tipo: 'cursada' }, { id: 25, tipo: 'cursada' }, { id: 27, tipo: 'cursada' }, 
+            { id: 13, tipo: 'aprobada' }, { id: 16, tipo: 'aprobada' }, { id: 19, tipo: 'aprobada' } 
+        ] },
+        // Organización Industrial (35): Requiere 'Regular' de 18
+        { id: 35, nombre: "Organización Industrial", nivel: 5, correlativas: [
+            { id: 18, tipo: 'cursada' } 
+        ] },
+
+        // NIVEL 6
+        // Economía (36): Requiere 'Regular' de 8 y 'Aprobada' de 4
+        { id: 36, nombre: "Economía", nivel: 6, correlativas: [
+            { id: 8, tipo: 'cursada' }, 
+            { id: 4, tipo: 'aprobada' } 
+        ] },
+        // Proyecto Final (37): Para Cursar requiere 'Regular' de 29-30-32 y 'Aprobada' de 22-23-25-27
+        { id: 37, nombre: "Proyecto Final", nivel: 6, correlativas: [
+            { id: 29, tipo: 'cursada' }, { id: 30, tipo: 'cursada' }, { id: 32, tipo: 'cursada' },
+            { id: 22, tipo: 'aprobada' }, { id: 23, tipo: 'aprobada' }, { id: 25, tipo: 'aprobada' }, { id: 27, tipo: 'aprobada' }
+            // OJO: Para rendir el FINAL de Proyecto Final requiere TODAS las materias. Esto NO se puede modelar aquí
+            // porque la lógica del botón es para HABILITAR CURSADA. El check del final es aparte.
+        ] },
+
+        // Otras (Práctica Profesional no tiene correlativas para cursar/aprobar)
+        { id: 38, nombre: "Práctica Profesional Supervisada", nivel: 6, correlativas: [] },
     ];
+    
+    // Si la materia 37 (Proyecto Final) tiene 4 prerequisitos de cursada y 4 de aprobada,
+    // y quieres agregar la Práctica Profesional Supervisada, le asignamos ID 38 y nivel 6.
 
     const contenedor = document.getElementById("semestres");
     const niveles = {};
     materias.forEach(m => {
-      if (!niveles[m.nivel]) niveles[m.nivel] = [];
-      niveles[m.nivel].push(m);
+        if (!niveles[m.nivel]) niveles[m.nivel] = [];
+        niveles[m.nivel].push(m);
     });
 
     const botonesMap = {};
-    const aprobadas = new Set(JSON.parse(localStorage.getItem("aprobadas") || "[]"));
+    // Utilizamos 'estados' para almacenar el estado (aprobado, regularizado o null/libre)
+    // El formato es: [ID_Materia, 'aprobado' | 'regularizado']
+    const estados = new Map(JSON.parse(localStorage.getItem("estados") || "[]")); 
 
     Object.entries(niveles).forEach(([nivel, ramos]) => {
-      const tarjeta = document.createElement("div");
-      tarjeta.className = "semestre";
-      const h2 = document.createElement("h2");
-      h2.textContent = `Nivel ${nivel}`;
-      tarjeta.appendChild(h2);
+        const tarjeta = document.createElement("div");
+        tarjeta.className = "semestre";
+        const h2 = document.createElement("h2");
+        h2.textContent = `Nivel ${nivel}`;
+        tarjeta.appendChild(h2);
 
-      ramos.forEach(ramo => {
-        const btn = document.createElement("button");
-        btn.className = "ramo";
-        btn.textContent = ramo.nombre;
-        btn.dataset.id = ramo.id;
-        tarjeta.appendChild(btn);
-        botonesMap[ramo.id] = btn;
+        ramos.forEach(ramo => {
+            const btn = document.createElement("button");
+            btn.className = "ramo";
+            btn.textContent = ramo.nombre;
+            btn.dataset.id = ramo.id;
+            tarjeta.appendChild(btn);
+            botonesMap[ramo.id] = btn;
 
-        if (aprobadas.has(ramo.id)) btn.classList.add("aprobado");
-      });
+            // Al inicio, asignamos la clase según el estado guardado
+            const estadoGuardado = estados.get(ramo.id);
+            if (estadoGuardado === 'aprobado') {
+                btn.classList.add("aprobado");
+            } else if (estadoGuardado === 'regularizado') {
+                btn.classList.add("regularizado");
+            }
+        });
 
-      contenedor.appendChild(tarjeta);
+        contenedor.appendChild(tarjeta);
     });
 
-    function actualizarHabilitados() {
-      materias.forEach(m => {
-        const btn = botonesMap[m.id];
-        if (m.correlativas.every(id => botonesMap[id].classList.contains("aprobado"))) {
-          btn.classList.add("habilitado");
-        } else {
-          btn.classList.remove("habilitado");
+    /**
+     * Comprueba si una materia correlativa cumple con el requisito.
+     * @param {number} idCorrelativa - ID de la materia pre-requisito.
+     * @param {'cursada'|'aprobada'} tipoRequisito - El tipo de requisito ('cursada' o 'aprobada').
+     * @returns {boolean} - true si cumple, false si no.
+     */
+    function cumpleCorrelativa(idCorrelativa, tipoRequisito) {
+        const btnCorrelativa = botonesMap[idCorrelativa];
+        
+        // Las materias que no están en el mapa (ej. si falta alguna o es optativa) se asumen No Cumple.
+        if (!btnCorrelativa) return false; 
+        
+        // 1. Requisito de APROBACIÓN (FINAL):
+        if (tipoRequisito === 'aprobada') {
+            // Debe tener la clase 'aprobado'
+            return btnCorrelativa.classList.contains("aprobado");
+        } 
+        
+        // 2. Requisito de CURSADA (REGULARIDAD):
+        if (tipoRequisito === 'cursada') {
+            // Debe tener la clase 'aprobado' O 'regularizado'
+            return btnCorrelativa.classList.contains("aprobado") || btnCorrelativa.classList.contains("regularizado");
         }
-      });
-      localStorage.setItem("aprobadas", JSON.stringify(
-        Object.entries(botonesMap)
-          .filter(([id, el]) => el.classList.contains("aprobado"))
-          .map(([id]) => parseInt(id))
-      ));
+        
+        return false; // Por defecto no cumple
     }
 
+    // Lógica para actualizar las clases de habilitado
+    function actualizarHabilitados() {
+        materias.forEach(m => {
+            const btn = botonesMap[m.id];
+            
+            // Si la materia ya está aprobada o regularizada, no la marcamos como "habilitada para cursar".
+            if (btn.classList.contains("aprobado") || btn.classList.contains("regularizado")) {
+                 btn.classList.remove("habilitado");
+                 return;
+            }
+            
+            // Comprobamos que TODAS las correlativas cumplen con el requisito
+            const estaHabilitada = m.correlativas.every(correlativa => 
+                cumpleCorrelativa(correlativa.id, correlativa.tipo)
+            );
+
+            if (estaHabilitada) {
+                btn.classList.add("habilitado");
+            } else {
+                btn.classList.remove("habilitado");
+            }
+        });
+        
+        // GUARDAR EL NUEVO ESTADO EN localStorage
+        const nuevosEstados = Array.from(estados.entries());
+        localStorage.setItem("estados", JSON.stringify(nuevosEstados));
+    }
+
+    // Lógica para cambiar de estado al hacer click
     Object.values(botonesMap).forEach(btn => {
-      btn.addEventListener("click", () => {
-        btn.classList.toggle("aprobado");
-        actualizarHabilitados();
-      });
+        btn.addEventListener("click", () => {
+            const id = parseInt(btn.dataset.id);
+            let estadoActual = estados.get(id);
+
+            // Ciclado de estados: null (Libre) -> regularizado -> aprobado -> null (Libre)
+            if (estadoActual === 'aprobado') {
+                estados.delete(id); // Borra el estado (vuelve a Libre)
+                btn.classList.remove("aprobado", "regularizado", "habilitado"); 
+            } else if (estadoActual === 'regularizado') {
+                estados.set(id, 'aprobado'); // Pasa de Regularizada a Aprobada
+                btn.classList.add("aprobado");
+                btn.classList.remove("regularizado");
+            } else { // estadoActual es null/undefined (Libre/Habilitada)
+                estados.set(id, 'regularizado'); // Pasa de Libre/Habilitada a Regularizada
+                btn.classList.add("regularizado");
+                // Removemos la clase 'habilitado' porque ya se está cursando/regularizando
+                btn.classList.remove("habilitado", "aprobado"); 
+            }
+            
+            actualizarHabilitados();
+        });
     });
 
     document.getElementById("reset").addEventListener("click", () => {
-      Object.values(botonesMap).forEach(b => {
-        b.classList.remove("aprobado", "habilitado");
-      });
-      localStorage.removeItem("aprobadas");
-      actualizarHabilitados();
-      window.scrollTo({ top: 0, behavior: "smooth" });
+        Object.values(botonesMap).forEach(b => {
+            b.classList.remove("aprobado", "regularizado", "habilitado");
+        });
+        localStorage.removeItem("estados");
+        estados.clear(); // Limpiamos el mapa interno
+        actualizarHabilitados();
+        window.scrollTo({ top: 0, behavior: "smooth" });
     });
 
+    // Inicializar al cargar la página
     actualizarHabilitados();
-  </script></body>
-    </html>
+</script>
